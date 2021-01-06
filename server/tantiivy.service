@@ -1,0 +1,12 @@
+[Unit]
+Description=tantivy
+
+[Service]
+ExecStartPre=/home/ubuntu/search/tantivy index -i . -f data.json
+ExecStart=/home/ubuntu/search/tantivy serve -i .
+WorkingDirectory=/home/ubuntu/search
+
+
+[Install]
+WantedBy=multi-user.target
+

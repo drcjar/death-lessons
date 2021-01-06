@@ -1,0 +1,122 @@
+{
+  "segments": [
+    {
+      "segment_id": "3cbda302-b02f-4db3-947e-7f031dd33795",
+      "max_doc": 34254,
+      "deletes": null
+    }
+  ],
+  "schema": [
+    {
+      "name": "person",
+      "type": "text",
+      "options": {
+        "indexing": {
+          "record": "basic",
+          "tokenizer": "default"
+        },
+        "stored": true
+      }
+    },
+    {
+      "name": "date_of_report",
+      "type": "text",
+      "options": {
+        "indexing": {
+          "record": "position",
+          "tokenizer": "default"
+        },
+        "stored": true
+      }
+    },
+    {
+      "name": "ref",
+      "type": "text",
+      "options": {
+        "indexing": {
+          "record": "position",
+          "tokenizer": "default"
+        },
+        "stored": true
+      }
+    },
+    {
+      "name": "name_of_deceased",
+      "type": "text",
+      "options": {
+        "indexing": {
+          "record": "basic",
+          "tokenizer": "default"
+        },
+        "stored": true
+      }
+    },
+    {
+      "name": "coroner_name",
+      "type": "text",
+      "options": {
+        "indexing": {
+          "record": "basic",
+          "tokenizer": "default"
+        },
+        "stored": true
+      }
+    },
+    {
+      "name": "coroner_area",
+      "type": "text",
+      "options": {
+        "indexing": {
+          "record": "basic",
+          "tokenizer": "default"
+        },
+        "stored": true
+      }
+    },
+    {
+      "name": "category",
+      "type": "text",
+      "options": {
+        "indexing": {
+          "record": "basic",
+          "tokenizer": "default"
+        },
+        "stored": true
+      }
+    },
+    {
+      "name": "filename",
+      "type": "text",
+      "options": {
+        "indexing": {
+          "record": "basic",
+          "tokenizer": "raw"
+        },
+        "stored": true
+      }
+    },
+    {
+      "name": "text",
+      "type": "text",
+      "options": {
+        "indexing": {
+          "record": "basic",
+          "tokenizer": "en_stem"
+        },
+        "stored": true
+      }
+    },
+    {
+      "name": "url",
+      "type": "text",
+      "options": {
+        "indexing": {
+          "record": "basic",
+          "tokenizer": "raw"
+        },
+        "stored": true
+      }
+    }
+  ],
+  "opstamp": 115297
+}
