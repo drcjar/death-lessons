@@ -1,39 +1,72 @@
 <!doctype html>
 <html>
-  <head>
-    <title>This is the title of the webpage!</title>
-  </head>
-  <body>
-    <p>This is an example paragraph. Anything in the <strong>body</strong> tag will appear on the page, just like this <strong>p</strong> tag and its contents.</p>
+
+<head>
+  <title>death-lessons.org</title>
+  <link rel="stylesheet" href="//cdn.datatables.net/1.10.23/css/jquery.dataTables.min.css">
+  <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+  <script src="//cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js"></script>
+</head>
+
+<body>
+  <form id="search"><input name="q" id="q"> <button type="submit">search</button></form>
+  <table id="results-table">
+  </table>
+
+</body>
+
+<script>
+  // global, datatable can't be initialised twice
+  let data_table;
 
 
-<form id="search"><input name="q" id="q"> <button type="submit">search</button></form> 
+  function runSearch(event) {
+    event.preventDefault();
+    let query = document.querySelector('#q').value;
 
-<div id="query">empty</div> 
+    function _transpose(array) {
+      return array[0].map((_, ix) => array.map(row => row[ix]));
+    }
 
-<div id="results">empty</div> 
+    // Keep query around
+    const url = new URL(window.location);
+    url.searchParams.set('q', query);
+    window.history.pushState({}, '', url);
 
-  </body>
+    fetch(`/api.json?q=${query}`).then(response => response.json()).then(result => {
 
-  <script>
+      const columns = ['ref', 'category', 'date_of_report', 'url'];
+      const data = _transpose(columns.map(col => result.hits.map(x => x.doc[col][0])));
 
-function runSearch(event){
+      if (data_table !== undefined) {
+        data_table.destroy();
+      }
 
-event.preventDefault(); 
+      data_table = $('#results-table').DataTable({
+        searching: false, // already searching in the search box
+        data: data,
+        columns: [
+          { title: "Ref" },
+          { title: "Category" },
+          { title: "Date" },
+          { title: "link", render: x => `<a href=${x}>Link</a>` },
+        ],
+      });
+    });
+  }
+  document.querySelector('#search').addEventListener('submit', runSearch);
 
-let query = document.querySelector('#q').value; 
+  $(document).ready(_ => {
+    // Allow sharing of URLs
+    const url = new URL(window.location);
+    const query = url.searchParams.get("q");
+    console.log("loading query", query);
+    if (query !== undefined) {
+      document.querySelector('#q').value = query;
+      document.querySelector('#search > button').click();
+    };
+  });
 
-fetch(`/api.json?q=${query}`).then(response => response.json()).then(x => { let result_element = document.querySelector('#results'); result_element.innerHTML = x.num_hits}) 
+</script>
 
-fetch(`/api.json?q=${query}`).then(response => response.json()).then(x => { let result_element = document.querySelector('#query'); result_element.innerHTML = x.q}) 
-
-
-console.log(document.querySelector('#q').value ) 
-
-}
-
-document.querySelector('#search').addEventListener('submit', runSearch)
-
-
-  </script>
 </html>
