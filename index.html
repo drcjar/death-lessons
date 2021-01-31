@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+  <head>
+    <title>This is the title of the webpage!</title>
+  </head>
+  <body>
+    <p>This is an example paragraph. Anything in the <strong>body</strong> tag will appear on the page, just like this <strong>p</strong> tag and its contents.</p>
+
+
+<form id="search"><input name="q" id="q"> <button type="submit">search</button></form> 
+
+<div id="query">empty</div> 
+
+<div id="results">empty</div> 
+
+  </body>
+
+  <script>
+
+function runSearch(event){
+
+event.preventDefault(); 
+
+let query = document.querySelector('#q').value; 
+
+fetch(`/api.json?q=${query}`).then(response => response.json()).then(x => { let result_element = document.querySelector('#results'); result_element.innerHTML = x.num_hits}) 
+
+fetch(`/api.json?q=${query}`).then(response => response.json()).then(x => { let result_element = document.querySelector('#query'); result_element.innerHTML = x.q}) 
+
+
+console.log(document.querySelector('#q').value ) 
+
+}
+
+document.querySelector('#search').addEventListener('submit', runSearch)
+
+
+  </script>
+</html>
