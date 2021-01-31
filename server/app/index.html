@@ -33,7 +33,7 @@
     url.searchParams.set('q', query);
     window.history.pushState({}, '', url);
 
-    fetch(`/api.json?q=${query}`).then(response => response.json()).then(result => {
+    fetch(`/api?q=${query}`).then(response => response.json()).then(result => {
 
       const columns = ['ref', 'category', 'date_of_report', 'url'];
       const data = _transpose(columns.map(col => result.hits.map(x => x.doc[col][0])));
