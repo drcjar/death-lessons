@@ -6,37 +6,68 @@
   <link rel="stylesheet" href="//cdn.datatables.net/1.10.23/css/jquery.dataTables.min.css">
   <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
   <script src="//cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 </head>
 
 <body>
-  <form id="search"><input name="q" id="q"> <button type="submit">search</button></form>
+
+  <div class="container-fluid">
+    <div class="row mt-4">
+      <div class="col-2"></div>
+      <div class="col-8">
+        Making Reports to Prevent Future Deaths searchable.
+      </div>
+
+    </div>
+    <div class="row mt-4">
+      <div class="col-2"></div>
+      <div class="col-8">
+        <form id="search">
+          <div class="form-row">
+            <div class="col-10">
+              <input class="form-control" name="q" id="q">
+            </div>
+
+            <div class="col-2">
+              <button class="btn btn-primary text-uppercase type=" submit">search</button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="col-2"></div>
+    </div>
+
+    <div class="row mt-4">
+      <div class="col-2"></div>
+      <div class="col-8">
+        <p>
+          Some example queries:
+        </p>
+        <ul>
+          <li>
+            <a href="http://deathlessons.org/?q=Asthma">Asthma</a>
+          </li>
+          <li>
+            <a href="http://deathlessons.org/?q=%22North+Middlesex+Hospital%22">"North Middlesex Hospital"</a>
+          </li>
+        </ul>
+
+      </div>
+    </div>
+
+    <div class="row mt-4">
+      <table id="results-table" class="display" style="width:100%">
+      </table>
+    </div>
+  </div>
+
 
   <div style="position: absolute; top: 0px; right: 0px;">
     <a href="https://github.com/drcjar/death-lessons"><img loading="lazy" width="149" height="149"
         src="https://github.blog/wp-content/uploads/2008/12/forkme_right_red_aa0000.png?resize=149%2C149"
         class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1"></a>
   </div>
-
-  <h1>Death Lessons</h1>
-  <p>
-    Making Reports to Prevent Future Deaths searchable.
-  </p>
-  <p>
-    Some example queries:
-  </p>
-  <ul>
-    <li>
-      <a href="http://deathlessons.org/?q=Asthma">Asthma</a>
-    </li>
-    <li>
-      <a href="http://deathlessons.org/?q=%22North+Middlesex+Hospital%22">"North Middlesex Hospital"</a>
-    </li>
-  </ul>
-
-
-
-  <table id="results-table" class="display" style="width:100%">
-  </table>
 
 </body>
 
@@ -71,6 +102,7 @@
       data_table = $('#results-table').DataTable({
         searching: false, // already searching in the search box
         data: data,
+        lengthChange: false,
         columns: [
           { title: "Text" },
           { title: "Filename" },
@@ -89,7 +121,7 @@
     console.log("loading query", query);
     if (query !== undefined) {
       document.querySelector('#q').value = query;
-      document.querySelector('#search > button').click();
+      document.querySelector('#search button').click();
     };
   });
 
