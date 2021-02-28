@@ -16,7 +16,7 @@ rsync -av --rsync-path="sudo rsync"  server/app/index.html  ubuntu@deathlessons.
 ## TODO
 
 * show only relevant snippet from the search (tom)
-* find prior art for design / style (Carl)
+* find prior art for design / style (Carl) - we should make search box more obvious to find e.g https://uxplanet.org/design-a-perfect-search-box-b6baaf9599c
 * link should not be its own column (tom)
 * remove "show 10 rows" (tom)
 * disable caching completely (tom)
