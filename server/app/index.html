@@ -8,20 +8,24 @@
   <script src="//cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js"></script>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
     integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <style>
+    .no-display {
+      display: none;
+    }
+  </style>
 </head>
+
 
 <body>
 
   <div class="container-fluid">
     <div class="row mt-4">
-      <div class="col-2"></div>
       <div class="col-8">
         Making Reports to Prevent Future Deaths searchable.
       </div>
 
     </div>
     <div class="row mt-4">
-      <div class="col-2"></div>
       <div class="col-8">
         <form id="search">
           <div class="form-row">
@@ -39,7 +43,6 @@
     </div>
 
     <div class="row mt-4">
-      <div class="col-2"></div>
       <div class="col-8">
         <p>
           Some example queries:
@@ -84,7 +87,6 @@
       return array[0].map((_, ix) => array.map(row => row[ix]));
     }
 
-
     // Keep query around
     const url = new URL(window.location);
     url.searchParams.set('q', query);
@@ -92,7 +94,7 @@
 
     fetch(`/api?q=${query}&nhits=1000`).then(response => response.json()).then(result => {
 
-      const columns = ['text', 'filename', 'ref', 'url'];
+      const columns = ['text', 'ref', 'url'];
       const data = _transpose(columns.map(col => result.hits.map(x => x.doc[col][0])));
 
       if (data_table !== undefined) {
@@ -104,14 +106,33 @@
         data: data,
         lengthChange: false,
         columns: [
-          { title: "Text" },
-          { title: "Filename" },
-          { title: "Ref" },
-          { title: "Link", render: x => `<a href=${x}>link</a>` },
+          {
+            title: "Text", render: (content, _, row) => {
+              const max = 250;
+              if (content.length > max) {
+                const c = content.substr(0, max);
+                const h = content.substr(max, content.length - max);
+                return `${c}<span class="top"><span class="ellipsis">...&nbsp;</span><span><span class="hidden-text no-display">${h}</span>&nbsp;
+                    <a href="#" class="show-more">show more</a></span>
+                </span>
+                `;
+              }
+            }
+          },
+          { title: "Ref", render: (x, _, row) => `<a href=${row[3]}>${x}</a>` },
         ],
       });
     });
+
+    $("#results-table").on("click", ".show-more", event => {
+      const top = $(event.target).parents('span.top');
+      top.find('.ellipsis').addClass('no-display');
+      top.find('.hidden-text').removeClass('no-display');
+      top.find('.show-more').addClass('no-display');
+      return false;
+    });
   }
+
   document.querySelector('#search').addEventListener('submit', runSearch);
 
   $(document).ready(_ => {
@@ -119,7 +140,7 @@
     const url = new URL(window.location);
     const query = url.searchParams.get("q");
     console.log("loading query", query);
-    if (query !== undefined) {
+    if (query !== undefined && query != "") {
       document.querySelector('#q').value = query;
       document.querySelector('#search button').click();
     };
