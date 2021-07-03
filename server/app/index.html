@@ -12,6 +12,10 @@
     .no-display {
       display: none;
     }
+
+    span.highlight {
+      background-color: #fcfc7d;
+    }
   </style>
 </head>
 
@@ -99,6 +103,24 @@
 
       if (data_table !== undefined) {
         data_table.destroy();
+        data_table = undefined;
+      }
+
+
+      // $&
+      function highlight(s, q) {
+        // trim leading and trailing quotation marks
+        if (q.startsWith('"')) {
+          q = q.substr(1);
+        }
+        if (q.endsWith('"')) {
+          q = q.slice(0, -1);
+        }
+
+        const qs = q.split(/\s+/).map(x => `\\b${x}\\b`);
+        const search = new RegExp(qs.join("\\s+"), "gi");
+        console.log(search);
+        return s.replaceAll(search, '<span class="highlight">$&</span>');
       }
 
       data_table = $('#results-table').DataTable({
@@ -110,8 +132,8 @@
             title: "Text", render: (content, _, row) => {
               const max = 250;
               if (content.length > max) {
-                const c = content.substr(0, max);
-                const h = content.substr(max, content.length - max);
+                const c = highlight(content.substr(0, max), query);
+                const h = highlight(content.substr(max, content.length - max), query);
                 return `${c}<span class="top"><span class="ellipsis">...&nbsp;</span><span><span class="hidden-text no-display">${h}</span>&nbsp;
                     <a href="#" class="show-more">show more</a></span>
                 </span>
@@ -119,7 +141,7 @@
               }
             }
           },
-          { title: "Ref", render: (x, _, row) => `<a href=${row[3]}>${x}</a>` },
+          { title: "Ref", render: (x, _, row) => `<a href=${row[2]}>${x}</a>` },
         ],
       });
     });
