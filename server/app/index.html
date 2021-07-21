@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>death-lessons.org</title>
+  <title>deathlessons.org</title>
   <link rel="stylesheet" href="//cdn.datatables.net/1.10.23/css/jquery.dataTables.min.css">
   <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
   <script src="//cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js"></script>
@@ -25,7 +25,7 @@
   <div class="container-fluid">
     <div class="row mt-4">
       <div class="col-8">
-        Making Reports to Prevent Future Deaths searchable.
+        <h3>Making Reports to Prevent Future Deaths searchable.</h3>
       </div>
 
     </div>
@@ -59,6 +59,10 @@
             <a href="http://deathlessons.org/?q=%22North+Middlesex+Hospital%22">"North Middlesex Hospital"</a>
           </li>
         </ul>
+        <p>
+          Dataset last updated 1st of June 2021 (<a href="https://www.judiciary.uk/subject/prevention-of-future-deaths/">source</a>)
+        </p>
+
 
       </div>
     </div>
@@ -119,7 +123,6 @@
 
         const qs = q.split(/\s+/).map(x => `\\b${x}\\b`);
         const search = new RegExp(qs.join("\\s+"), "gi");
-        console.log(search);
         return s.replaceAll(search, '<span class="highlight">$&</span>');
       }
 
