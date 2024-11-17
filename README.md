@@ -4,6 +4,11 @@ Death lessions makes preventing future death reports searchable. In the UK, when
 
 Prior to [deathlessons.org](http://deathlessons.org) PFD reports were not easily searchable because they are published as PDFs. One could not, for example, readily find all PFD reports mentioning [asthma](http://deathlessons.org/?q=Asthma). Now you can.
 
+# Downloading the data
+
+If you like you can [download a csv](https://github.com/drcjar/death-lessons/blob/master/death_lessons.csv) of all of the data. The header looks like this:
+![image](https://github.com/user-attachments/assets/58627e47-6fb3-4af1-ba40-e1be41449859)
+
 # Technical Notes
 
 ## Deploying the HTML
