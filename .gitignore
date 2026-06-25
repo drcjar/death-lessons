@@ -1,2 +1,31 @@
 .ipynb_checkpoints/
 .~lock.*
+__pycache__/
+*.pyc
+
+# Python environments
+.venv/
+.venv-work/
+
+# Pipeline caches and scraped inputs (regenerate with `make update`)
+downloads/
+texts/
+report_pages.json
+cached_pdf_links.json
+people_data.json
+people_data.pickle
+extraction_source.json
+url_status_cache.json
+pdf_urls.csv
+urls.csv
+pipeline_checkpoint.json
+
+# Derived outputs (data.json is deployed to the tantivy server, not git;
+# both exceed GitHub's file-size limits anyway)
+data.json
+data.csv
+data.json.bak-*
+download_failures.json
+
+# Logs
+*.log
