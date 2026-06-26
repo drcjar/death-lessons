@@ -153,6 +153,13 @@ def combine_text_and_metadata_to_json():
             content = sanitize_text(f.read())
         raw_meta = metadata_dict.get(pdf_filename, [])
         fields = extract_fields(raw_meta)
+        # Most docs (responses + many reports) aren't keyed in people_data.json,
+        # so their scraped ref is empty. The judiciary ref (YYYY-NNNN) is almost
+        # always present in the filename, so fall back to it when missing.
+        if not fields["ref"].strip():
+            m = re.search(r'(20\d{2})[-_ ](\d{4})', pdf_filename)
+            if m:
+                fields["ref"] = f"{m.group(1)}-{m.group(2)}"
         base_slug = os.path.splitext(pdf_filename)[0].lower().replace(" ", "-")
         clean_slug = re.sub(r'-\d{4}-\d{4}(_.*)?$', '', base_slug)
         entry = {

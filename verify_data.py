@@ -113,9 +113,15 @@ if baks:
         warnings.append(f"{len(lost)} filenames in old file are missing from new "
                         f"(e.g. {sorted(lost)[:3]})")
 
+# --- metadata coverage ---
+empty_ref = sum(1 for r in rows if not r.get("ref", "").strip())
+ref_pct = 100 * (n - empty_ref) / n if n else 0
+print(f"\nref populated: {n - empty_ref}/{n} ({ref_pct:.1f}%)  empty: {empty_ref}")
+warn(ref_pct >= 95, f"ref coverage {ref_pct:.1f}% is below 95% — check metadata/filename fallback")
+
 # --- content stats ---
 asthma = sum(1 for r in rows if "asthma" in r.get("text", "").lower())
-print(f"\nrecords mentioning 'asthma': {asthma}")
+print(f"records mentioning 'asthma': {asthma}")
 
 # --- cross-check against on-disk texts ---
 txt_count = len(glob.glob(os.path.join("texts", "*.txt")))
