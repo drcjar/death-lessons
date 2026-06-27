@@ -41,6 +41,12 @@ class Settings(BaseSettings):
     # Bespoke report intake notifications go here
     bespoke_inbox: str = "hello@deathlessons.org"
 
+    # Saved-query alerts (Phase 2)
+    tantivy_url: str = "http://127.0.0.1:3000"     # local tantivy serve
+    corpus_path: str = "/home/ubuntu/search/data.json"  # source of truth for filenames
+    alert_nhits: int = 2000                        # hits fetched per saved query
+    max_saved_queries: int = 25                    # per subscriber
+
 
 @lru_cache
 def get_settings() -> Settings:

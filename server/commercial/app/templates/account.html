@@ -15,13 +15,31 @@
 
 <h5 class="mt-4">Saved-query alerts</h5>
 {% if alerts_active %}
-  <p>✔ Subscription active.</p>
+  <p>✔ Subscription active. We'll email you when a new PFD matches any of these.</p>
   {% if saved_queries %}
-    <ul>{% for q in saved_queries %}<li><code>{{ q.query }}</code>{% if q.include_responses %} (incl. responses){% endif %}</li>{% endfor %}</ul>
+    <ul class="list-group mb-3">
+      {% for q in saved_queries %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span><code>{{ q.query }}</code>{% if q.include_responses %} <span class="badge badge-secondary">incl. responses</span>{% endif %}</span>
+        <form method="post" action="/saved-queries/{{ q.id }}/delete" class="mb-0">
+          <button class="btn btn-sm btn-outline-danger">Remove</button>
+        </form>
+      </li>
+      {% endfor %}
+    </ul>
   {% else %}
-    <p class="text-muted">No saved queries yet. (Saved-query management ships in the next release.)</p>
+    <p class="text-muted">No saved searches yet — add one below.</p>
   {% endif %}
+  <form method="post" action="/saved-queries" class="form-inline">
+    <input class="form-control mr-2 mb-2" name="query" placeholder="e.g. clozapine, or &quot;button battery&quot;" required style="min-width:280px;">
+    <div class="form-check mr-2 mb-2">
+      <input class="form-check-input" type="checkbox" name="include_responses" id="ir" value="1">
+      <label class="form-check-label" for="ir">incl. responses</label>
+    </div>
+    <button class="btn btn-primary mb-2">Add saved search</button>
+  </form>
 {% else %}
-  <p>No active subscription. <a href="/pricing">Subscribe</a>.</p>
+  <p>No active subscription. <a href="/pricing">Subscribe</a> to get emailed when a new PFD
+    matches a drug, device, hospital or hazard you monitor.</p>
 {% endif %}
 {% endblock %}

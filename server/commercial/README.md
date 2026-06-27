@@ -93,19 +93,33 @@ sudo systemctl reload nginx
 
 Point `app.deathlessons.org` DNS at the Lightsail static IP first.
 
-## Refresh
+## Refresh (run after each dataset update)
 
-After each pipeline refresh (`make update` in the notebooks dir), rebuild
-the artifact so buyers get current data:
+After each pipeline refresh (`make update` in the notebooks dir):
 
 ```
+# 1. rebuild the buyer artifact so downloads are current
 .venv/bin/python build_dataset_artifact.py /home/ubuntu/search/data.json \
     data/deathlessons-corpus.jsonl.gz
+
+# 2. re-index tantivy (so alert matching sees the new docs)
+sudo systemctl restart tantiivy.service
+
+# 3. email subscribers about new docs matching their saved searches
+.venv/bin/python run_alerts.py
 ```
+
+Order matters: alerts query the live tantivy index, so step 3 must run
+after step 2. `run_alerts.py` is safe to re-run — each document only ever
+alerts once (tracked in the `seen_docs` table; the very first run seeds
+silently so nobody is emailed the back-catalogue).
+
+A simple cron/systemd-timer wrapping these three steps automates the
+whole refresh.
 
 ## Status
 
 - [x] Phase 0 — foundation (auth, Stripe, account, webhook)
 - [x] Phase 1 — bulk dataset download
-- [ ] Phase 2 — saved-query alerts matcher (hook into `make update`)
+- [x] Phase 2 — saved-query alerts (management UI + matcher, `run_alerts.py`)
 - [ ] Phase 3 — bespoke flow is enquiry-only; add Stripe payment if desired

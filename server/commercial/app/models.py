@@ -75,3 +75,12 @@ class SavedQuery(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User", back_populates="saved_queries")
+
+
+class SeenDoc(Base):
+    """Every corpus document the alert matcher has already considered, so a
+    document only ever triggers an alert once (the run after it appears)."""
+    __tablename__ = "seen_docs"
+    id = Column(Integer, primary_key=True)
+    filename = Column(String, unique=True, index=True, nullable=False)
+    first_seen = Column(DateTime, default=datetime.utcnow)

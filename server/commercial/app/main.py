@@ -22,6 +22,7 @@ from .downloads import make_download_token, verify_download_token
 from .emailer import send_magic_link
 from .models import Purchase, Subscription, SavedQuery
 from .emailer import send_email
+from sqlalchemy import func
 
 logging.basicConfig(level=logging.INFO)
 settings = get_settings()
@@ -114,6 +115,45 @@ def account(request: Request, db: Session = Depends(get_db)):
         "alerts_active": bool(alerts_sub and alerts_sub.is_active),
         "saved_queries": saved,
     })
+
+
+# --- saved queries (alerts) ----------------------------------------------
+
+def _alerts_active(db: Session, user) -> bool:
+    sub = (db.query(Subscription)
+           .filter_by(user_id=user.id, product="alerts")
+           .order_by(Subscription.id.desc()).first())
+    return bool(sub and sub.is_active)
+
+
+@app.post("/saved-queries")
+def add_saved_query(request: Request, query: str = Form(...),
+                    include_responses: str = Form(default=""),
+                    db: Session = Depends(get_db)):
+    user = _user(request, db)
+    if not user:
+        return RedirectResponse("/login", status_code=303)
+    query = query.strip()
+    # Only subscribers can save queries, and only up to the cap.
+    if query and _alerts_active(db, user):
+        count = db.query(func.count(SavedQuery.id)).filter_by(user_id=user.id).scalar()
+        if count < settings.max_saved_queries:
+            db.add(SavedQuery(user_id=user.id, query=query,
+                              include_responses=bool(include_responses)))
+            db.commit()
+    return RedirectResponse("/account", status_code=303)
+
+
+@app.post("/saved-queries/{sq_id}/delete")
+def delete_saved_query(sq_id: int, request: Request, db: Session = Depends(get_db)):
+    user = _user(request, db)
+    if not user:
+        return RedirectResponse("/login", status_code=303)
+    sq = db.get(SavedQuery, sq_id)
+    if sq and sq.user_id == user.id:      # only your own
+        db.delete(sq)
+        db.commit()
+    return RedirectResponse("/account", status_code=303)
 
 
 # --- checkout / portal ---------------------------------------------------
