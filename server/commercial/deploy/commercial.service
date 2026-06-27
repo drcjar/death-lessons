@@ -1,0 +1,14 @@
+[Unit]
+Description=deathlessons.org commercial app (FastAPI)
+After=network.target
+
+[Service]
+# Runs alongside nginx + tantivy on the existing Lightsail box. No extra cost.
+WorkingDirectory=/home/ubuntu/commercial
+EnvironmentFile=/home/ubuntu/commercial/.env
+ExecStart=/home/ubuntu/commercial/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000
+Restart=on-failure
+User=ubuntu
+
+[Install]
+WantedBy=multi-user.target
