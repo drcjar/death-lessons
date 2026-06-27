@@ -41,6 +41,16 @@
               <button class="btn btn-primary text-uppercase type=" submit">search</button>
             </div>
           </div>
+          <div class="form-row mt-2">
+            <div class="col">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="include-responses">
+                <label class="form-check-label" for="include-responses">
+                  Include agency responses (default: Prevention of Future Death reports only)
+                </label>
+              </div>
+            </div>
+          </div>
         </form>
       </div>
       <div class="col-2"></div>
@@ -85,15 +95,85 @@
 <script>
   // global, datatable can't be initialised twice
   let data_table;
+  // cache the last response so the responses toggle can re-filter without refetching
+  let lastHits = [];
+  let lastQuery = "";
 
+  function _transpose(array) {
+    if (array.length === 0 || array[0].length === 0) return [];
+    return array[0].map((_, ix) => array.map(row => row[ix]));
+  }
+
+  // $&
+  function highlight(s, q) {
+    // trim leading and trailing quotation marks
+    if (q.startsWith('"')) {
+      q = q.substr(1);
+    }
+    if (q.endsWith('"')) {
+      q = q.slice(0, -1);
+    }
+
+    const qs = q.split(/\s+/).map(x => `\\b${x}\\b`);
+    const search = new RegExp(qs.join("\\s+"), "gi");
+    return s.replaceAll(search, '<span class="highlight">$&</span>');
+  }
+
+  // A document is an agency "response" (not a PFD report) if its filename
+  // says so. Mirrors the build_data.py rule exactly.
+  function isResponse(hit) {
+    const fn = (hit.doc.filename && hit.doc.filename[0]) || "";
+    return fn.toLowerCase().includes("response");
+  }
+
+  // Render the cached hits, filtered by the responses toggle.
+  function render() {
+    const includeResponses = document.querySelector('#include-responses').checked;
+    const hits = includeResponses ? lastHits : lastHits.filter(h => !isResponse(h));
+
+    // Keep the toggle state in the URL so results are shareable
+    const url = new URL(window.location);
+    if (includeResponses) {
+      url.searchParams.set('responses', '1');
+    } else {
+      url.searchParams.delete('responses');
+    }
+    window.history.replaceState({}, '', url);
+
+    const columns = ['text', 'ref', 'url'];
+    const data = _transpose(columns.map(col => hits.map(x => x.doc[col][0])));
+
+    if (data_table !== undefined) {
+      data_table.destroy();
+      data_table = undefined;
+    }
+
+    data_table = $('#results-table').DataTable({
+      searching: false, // already searching in the search box
+      data: data,
+      lengthChange: false,
+      columns: [
+        {
+          title: "Text", render: (content, _, row) => {
+            const max = 250;
+            if (content.length > max) {
+              const c = highlight(content.substr(0, max), lastQuery);
+              const h = highlight(content.substr(max, content.length - max), lastQuery);
+              return `${c}<span class="top"><span class="ellipsis">...&nbsp;</span><span><span class="hidden-text no-display">${h}</span>&nbsp;
+                  <a href="#" class="show-more">show more</a></span>
+              </span>
+              `;
+            }
+          }
+        },
+        { title: "Ref", render: (x, _, row) => `<a href=${row[2]}>${x}</a>` },
+      ],
+    });
+  }
 
   function runSearch(event) {
     event.preventDefault();
     let query = document.querySelector('#q').value;
-
-    function _transpose(array) {
-      return array[0].map((_, ix) => array.map(row => row[ix]));
-    }
 
     // Keep query around
     const url = new URL(window.location);
@@ -101,52 +181,9 @@
     window.history.pushState({}, '', url);
 
     fetch(`/api?q=${query}&nhits=1000`).then(response => response.json()).then(result => {
-
-      const columns = ['text', 'ref', 'url'];
-      const data = _transpose(columns.map(col => result.hits.map(x => x.doc[col][0])));
-
-      if (data_table !== undefined) {
-        data_table.destroy();
-        data_table = undefined;
-      }
-
-
-      // $&
-      function highlight(s, q) {
-        // trim leading and trailing quotation marks
-        if (q.startsWith('"')) {
-          q = q.substr(1);
-        }
-        if (q.endsWith('"')) {
-          q = q.slice(0, -1);
-        }
-
-        const qs = q.split(/\s+/).map(x => `\\b${x}\\b`);
-        const search = new RegExp(qs.join("\\s+"), "gi");
-        return s.replaceAll(search, '<span class="highlight">$&</span>');
-      }
-
-      data_table = $('#results-table').DataTable({
-        searching: false, // already searching in the search box
-        data: data,
-        lengthChange: false,
-        columns: [
-          {
-            title: "Text", render: (content, _, row) => {
-              const max = 250;
-              if (content.length > max) {
-                const c = highlight(content.substr(0, max), query);
-                const h = highlight(content.substr(max, content.length - max), query);
-                return `${c}<span class="top"><span class="ellipsis">...&nbsp;</span><span><span class="hidden-text no-display">${h}</span>&nbsp;
-                    <a href="#" class="show-more">show more</a></span>
-                </span>
-                `;
-              }
-            }
-          },
-          { title: "Ref", render: (x, _, row) => `<a href=${row[2]}>${x}</a>` },
-        ],
-      });
+      lastHits = result.hits;
+      lastQuery = query;
+      render();
     });
 
     $("#results-table").on("click", ".show-more", event => {
@@ -159,11 +196,18 @@
   }
 
   document.querySelector('#search').addEventListener('submit', runSearch);
+  // Re-filter instantly when the responses toggle changes (no refetch)
+  document.querySelector('#include-responses').addEventListener('change', _ => {
+    if (lastHits.length > 0) render();
+  });
 
   $(document).ready(_ => {
-    // Allow sharing of URLs
+    // Allow sharing of URLs (query + responses toggle)
     const url = new URL(window.location);
     const query = url.searchParams.get("q");
+    if (url.searchParams.get("responses") === "1") {
+      document.querySelector('#include-responses').checked = true;
+    }
     console.log("loading query", query);
     if (query !== undefined && query != "") {
       document.querySelector('#q').value = query;
