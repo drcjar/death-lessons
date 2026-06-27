@@ -112,6 +112,27 @@ def sanitize_text(text):
     return _CTRL.sub(" ", text)
 
 
+# The judiciary metadata block comes in two shapes: separate paragraphs
+# (one label each) and a single concatenated blob where labels are glued
+# onto the previous value ("...27/02/2023Ref: 2023-0076Deceased name:...").
+# So we locate each label by phrase (no word boundary — labels can be glued
+# to letters/digits) and take the text up to the next label. "Coroners"/
+# "Coroner" and "This report is being sent to" (a value terminator) are both
+# handled. Order in _LABELS only affects regex alternation, not output.
+_LABELS = [
+    ("date_of_report", r"date of report"),
+    ("name_of_deceased", r"deceased name"),
+    ("coroner_name", r"coroner'?s? name"),
+    ("coroner_area", r"coroner'?s? area"),
+    ("category", r"category"),
+    ("ref", r"ref"),
+    ("_boundary", r"this report is being sent to"),
+]
+_LABEL_RE = re.compile(
+    "(?:" + "|".join(f"(?P<{k}>{p})" for k, p in _LABELS) + r")\s*:",
+    re.IGNORECASE)
+
+
 def combine_text_and_metadata_to_json():
     def clean(text):
         return re.sub(r"[\xa0​\n\r]+", " ", text).strip()
@@ -120,21 +141,20 @@ def combine_text_and_metadata_to_json():
         fields = {"date_of_report": "", "ref": "", "name_of_deceased": "",
                   "coroner_name": "", "coroner_area": "", "category": ""}
         for html in paragraphs:
-            soup = BeautifulSoup(html, "html.parser")
-            text = clean(soup.get_text())
-            tl = text.lower()
-            if "date of report" in tl:
-                fields["date_of_report"] = text
-            elif tl.startswith("ref"):
-                fields["ref"] = text.replace("Ref:", "").strip()
-            elif "deceased name" in tl:
-                fields["name_of_deceased"] = text
-            elif "coroners name" in tl:
-                fields["coroner_name"] = text
-            elif "coroners area" in tl:
-                fields["coroner_area"] = text
-            elif "category" in tl:
-                fields["category"] = text
+            text = clean(BeautifulSoup(html, "html.parser").get_text())
+            matches = list(_LABEL_RE.finditer(text))
+            for i, m in enumerate(matches):
+                key = m.lastgroup
+                if key == "_boundary":
+                    continue
+                end = matches[i + 1].start() if i + 1 < len(matches) else len(text)
+                value = text[m.start():end].strip()
+                if not fields[key]:            # first occurrence wins
+                    fields[key] = value
+        # ref is stored bare (no "Ref:" prefix), matching the existing format
+        if fields["ref"]:
+            fields["ref"] = re.sub(r"^ref\s*:?\s*", "", fields["ref"],
+                                   flags=re.IGNORECASE).strip()
         return fields
 
     with open(METADATA_PATH, encoding='utf-8') as f:

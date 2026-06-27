@@ -24,7 +24,7 @@ pipeline_checkpoint.json
 # both exceed GitHub's file-size limits anyway)
 data.json
 data.csv
-data.json.bak-*
+*.bak-*
 download_failures.json
 
 # Logs
