@@ -84,3 +84,17 @@ class SeenDoc(Base):
     id = Column(Integer, primary_key=True)
     filename = Column(String, unique=True, index=True, nullable=False)
     first_seen = Column(DateTime, default=datetime.utcnow)
+
+
+class BespokeEnquiry(Base):
+    """A request for a bespoke analytical report. Custom-priced, so the flow
+    is: capture brief -> scope it -> send a Stripe invoice -> mark paid."""
+    __tablename__ = "bespoke_enquiries"
+    id = Column(Integer, primary_key=True)
+    email = Column(String, nullable=False, index=True)
+    brief = Column(Text, nullable=False)
+    status = Column(String, default="new")              # new, invoiced, paid, done, cancelled
+    stripe_invoice_id = Column(String, nullable=True, index=True)
+    amount = Column(Integer, nullable=True)             # minor units (pence)
+    currency = Column(String, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)

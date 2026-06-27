@@ -20,7 +20,7 @@ from .config import get_settings
 from .db import get_db, init_db
 from .downloads import make_download_token, verify_download_token
 from .emailer import send_magic_link
-from .models import Purchase, Subscription, SavedQuery
+from .models import Purchase, Subscription, SavedQuery, BespokeEnquiry
 from .emailer import send_email
 from sqlalchemy import func
 
@@ -194,10 +194,17 @@ def billing_portal(request: Request, db: Session = Depends(get_db)):
 @app.post("/bespoke", response_class=HTMLResponse)
 def bespoke(request: Request, email: str = Form(...), brief: str = Form(...),
             db: Session = Depends(get_db)):
+    enquiry = BespokeEnquiry(email=email.strip().lower(), brief=brief.strip())
+    db.add(enquiry)
+    db.commit()
+    db.refresh(enquiry)
     send_email(settings.bespoke_inbox,
-               "New bespoke report enquiry",
-               f"<p>From: {email}</p><pre>{brief}</pre>",
-               text=f"From: {email}\n\n{brief}")
+               f"New bespoke report enquiry #{enquiry.id}",
+               f"<p>#{enquiry.id} from {email}</p><pre>{brief}</pre>"
+               f"<p>Send an invoice: "
+               f"<code>python bespoke_invoice.py {enquiry.id} &lt;amount_pence&gt;</code></p>",
+               text=f"#{enquiry.id} from {email}\n\n{brief}\n\n"
+                    f"Send an invoice: python bespoke_invoice.py {enquiry.id} <amount_pence>")
     return templates.TemplateResponse(request, "bespoke_sent.html", {})
 
 

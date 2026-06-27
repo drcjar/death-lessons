@@ -45,8 +45,8 @@ In the Stripe dashboard:
    recurring price (alerts). Put the price IDs in `.env`
    (`STRIPE_PRICE_DATASET`, `STRIPE_PRICE_ALERTS`).
 2. Add a **webhook** endpoint → `https://app.deathlessons.org/stripe/webhook`,
-   subscribe to `checkout.session.completed` and
-   `customer.subscription.*`. Copy the signing secret into
+   subscribe to `checkout.session.completed`, `customer.subscription.*`
+   and `invoice.paid`. Copy the signing secret into
    `STRIPE_WEBHOOK_SECRET`.
 3. Put your secret key in `STRIPE_SECRET_KEY`.
 4. Enable the **Customer Portal** (Settings → Billing) so `/portal` works.
@@ -117,9 +117,23 @@ silently so nobody is emailed the back-catalogue).
 A simple cron/systemd-timer wrapping these three steps automates the
 whole refresh.
 
+## Bespoke reports (custom-priced)
+
+These are scoped per job, so the flow is enquiry → quote → invoice:
+
+1. Customer submits a brief at `/bespoke` (stored as a `BespokeEnquiry`;
+   you get an email notification with the enquiry id).
+2. You scope it and send a Stripe invoice:
+   ```
+   .venv/bin/python bespoke_invoice.py            # list open enquiries
+   .venv/bin/python bespoke_invoice.py 3 45000 "Asthma PFD analysis"
+   ```
+   (`45000` = £450.00.) Stripe emails the customer a hosted payment page.
+3. The `invoice.paid` webhook marks the enquiry `paid`; you deliver.
+
 ## Status
 
 - [x] Phase 0 — foundation (auth, Stripe, account, webhook)
 - [x] Phase 1 — bulk dataset download
 - [x] Phase 2 — saved-query alerts (management UI + matcher, `run_alerts.py`)
-- [ ] Phase 3 — bespoke flow is enquiry-only; add Stripe payment if desired
+- [x] Phase 3 — bespoke enquiries persisted + Stripe invoicing (`bespoke_invoice.py`)

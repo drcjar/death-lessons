@@ -9,7 +9,7 @@ import stripe
 from sqlalchemy.orm import Session
 
 from .config import get_settings
-from .models import Purchase, Subscription, User
+from .models import BespokeEnquiry, Purchase, Subscription, User
 
 log = logging.getLogger("commercial.payments")
 settings = get_settings()
@@ -57,6 +57,28 @@ def portal(db: Session, user: User) -> str:
     session = stripe.billing_portal.Session.create(
         customer=customer, return_url=f"{settings.base_url}/account")
     return session.url
+
+
+def send_bespoke_invoice(db: Session, enquiry: BespokeEnquiry, amount_pence: int,
+                         currency: str = "gbp", description: str | None = None) -> str:
+    """Create + finalise + send a Stripe invoice for a bespoke enquiry.
+    Stripe emails the customer a hosted payment page. Returns its URL."""
+    customer = stripe.Customer.create(
+        email=enquiry.email, metadata={"bespoke_enquiry_id": enquiry.id})
+    stripe.InvoiceItem.create(
+        customer=customer.id, amount=amount_pence, currency=currency,
+        description=description or f"Bespoke analytical report (enquiry #{enquiry.id})")
+    invoice = stripe.Invoice.create(
+        customer=customer.id, collection_method="send_invoice", days_until_due=14,
+        metadata={"bespoke_enquiry_id": enquiry.id})
+    invoice = stripe.Invoice.finalize_invoice(invoice.id)
+    stripe.Invoice.send_invoice(invoice.id)
+    enquiry.status = "invoiced"
+    enquiry.stripe_invoice_id = invoice.id
+    enquiry.amount = amount_pence
+    enquiry.currency = currency
+    db.commit()
+    return invoice.hosted_invoice_url
 
 
 # --- webhook -------------------------------------------------------------
@@ -116,3 +138,13 @@ def handle_webhook(db: Session, payload: bytes, sig_header: str) -> None:
             sub.current_period_end = period_end
         db.commit()
         log.info("subscription %s -> %s for user %s", obj["id"], obj["status"], user.id)
+
+    elif etype == "invoice.paid":
+        eid = (obj.get("metadata") or {}).get("bespoke_enquiry_id")
+        enquiry = (db.get(BespokeEnquiry, int(eid)) if eid
+                   else db.query(BespokeEnquiry)
+                   .filter_by(stripe_invoice_id=obj["id"]).first())
+        if enquiry:
+            enquiry.status = "paid"
+            db.commit()
+            log.info("bespoke enquiry %s marked paid", enquiry.id)
