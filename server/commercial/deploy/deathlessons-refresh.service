@@ -1,0 +1,12 @@
+[Unit]
+Description=deathlessons.org data refresh (corpus rebuild + reindex + alerts)
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+# Install on the host that holds the pipeline checkout. Adjust User and the
+# path to refresh.sh. Set SERVER (and any *_DIR overrides) via Environment.
+User=drcjar
+Environment=SERVER=ubuntu@deathlessons.org
+ExecStart=/home/drcjar/dlessons/notebooks/server/commercial/deploy/refresh.sh

@@ -67,7 +67,40 @@ Default is **Resend** (free tier: ample for magic links + alerts). Set
 **SES** is an alternative (fractions of a cent); swap the one HTTP call
 in `app/emailer.py` for a boto3 `send_email` if you prefer.
 
-## Deploy to Lightsail
+## One-command deploy & refresh
+
+Two scripts in `deploy/` wrap everything (override the target with
+`SERVER=...`):
+
+```
+# Deploy site + data + commercial app (idempotent; re-run after any change)
+SERVER=ubuntu@deathlessons.org ./server/commercial/deploy/deploy.sh
+
+# Ongoing data refresh: rebuild corpus -> push -> reindex -> artifact -> alerts
+SERVER=ubuntu@deathlessons.org ./server/commercial/deploy/refresh.sh
+```
+
+First `deploy.sh` run: it seeds `.env` from the example on the server and
+tells you to fill in real secrets, then re-run. After DNS is pointed, get
+TLS once with `ssh $SERVER 'sudo certbot --nginx -d app.deathlessons.org'`.
+
+**Schedule the refresh** on the host that holds this pipeline checkout —
+either cron:
+
+```
+30 7 * * *  SERVER=ubuntu@deathlessons.org /path/to/server/commercial/deploy/refresh.sh >> ~/refresh.log 2>&1
+```
+
+or the systemd timer (edit the `User`/paths in the unit first):
+
+```
+sudo cp deploy/deathlessons-refresh.{service,timer} /etc/systemd/system/
+sudo systemctl daemon-reload && sudo systemctl enable --now deathlessons-refresh.timer
+```
+
+The manual steps below are what those scripts automate.
+
+## Deploy to Lightsail (manual reference)
 
 ```
 # on the box, as ubuntu
