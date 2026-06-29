@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Pricing — deathlessons.org{% endblock %}
+{% block content %}
+<h3>Plans &amp; pricing</h3>
+<p class="text-muted">The public full-text search is free and always will be. These paid
+  services add value on top of the public data.</p>
+
+<div class="card-deck">
+  <div class="card mb-3">
+    <div class="card-body">
+      <h5 class="card-title">Bulk dataset</h5>
+      <h6 class="text-muted">{{ s.price_dataset_label }}</h6>
+      <p class="card-text">The full cleaned, OCR'd, metadata-tagged corpus as JSONL —
+        reports and responses, ready for analysis.</p>
+      <form method="post" action="/buy/dataset">
+        <button class="btn btn-primary btn-block">Buy dataset</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="card mb-3">
+    <div class="card-body">
+      <h5 class="card-title">Saved-query alerts</h5>
+      <h6 class="text-muted">{{ s.price_alerts_label }}</h6>
+      <p class="card-text">Get emailed when a new PFD matches your full-text query —
+        a drug, device, hospital or hazard you monitor.</p>
+      <form method="post" action="/buy/alerts">
+        <button class="btn btn-primary btn-block">Subscribe</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="card mb-3">
+    <div class="card-body">
+      <h5 class="card-title">Bespoke report</h5>
+      <h6 class="text-muted">{{ s.price_bespoke_label }}</h6>
+      <p class="card-text">We answer a specific question across the whole corpus and
+        deliver a written analysis.</p>
+      <a class="btn btn-outline-primary btn-block" href="#bespoke">Enquire</a>
+    </div>
+  </div>
+</div>
+
+<hr>
+<h5 id="bespoke">Enquire about a bespoke report</h5>
+<form method="post" action="/bespoke">
+  <div class="form-group">
+    <label>Your email</label>
+    <input class="form-control" type="email" name="email" required>
+  </div>
+  <div class="form-group">
+    <label>What would you like us to analyse?</label>
+    <textarea class="form-control" name="brief" rows="4" required></textarea>
+  </div>
+  <button class="btn btn-primary">Send enquiry</button>
+</form>
+{% endblock %}

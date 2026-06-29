@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Sign in — deathlessons.org{% endblock %}
+{% block content %}
+<h3>Sign in</h3>
+<p class="text-muted">No password — we email you a one-time sign-in link.</p>
+{% if request.query_params.get('error') == 'expired' %}
+<div class="alert alert-warning">That link expired or was already used. Request a new one.</div>
+{% endif %}
+<form method="post" action="/login" style="max-width: 420px;">
+  <div class="form-group">
+    <label>Email</label>
+    <input class="form-control" type="email" name="email" required autofocus>
+  </div>
+  <button class="btn btn-primary">Email me a sign-in link</button>
+</form>
+{% endblock %}
