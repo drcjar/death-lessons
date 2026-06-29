@@ -2,6 +2,7 @@
 handling. Stripe has no fixed fee — it only takes a percentage of actual
 sales — so this adds no running cost.
 """
+from __future__ import annotations
 import logging
 from datetime import datetime
 

@@ -5,6 +5,7 @@ verifies it (and re-checks entitlement) before streaming the file. The
 token is signed with SECRET_KEY, so no link can be forged or outlive its
 TTL.
 """
+from __future__ import annotations
 from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
 
 from .config import get_settings

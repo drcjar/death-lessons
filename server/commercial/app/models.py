@@ -1,5 +1,6 @@
 """Database models. Deliberately small — accounts, magic-link tokens,
 one-off purchases, subscriptions, and saved queries (Phase 2)."""
+from __future__ import annotations
 from datetime import datetime
 
 from sqlalchemy import (Boolean, Column, DateTime, ForeignKey, Integer,

@@ -1,3 +1,4 @@
+from __future__ import annotations
 #!/usr/bin/env python3
 """Run one saved-query alert cycle. Invoke after the pipeline refresh and
 tantivy re-index, e.g. from the deploy/refresh script:

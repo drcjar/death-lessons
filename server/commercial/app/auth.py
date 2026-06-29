@@ -4,6 +4,7 @@
 - Verify: exchange the token for a signed session cookie.
 - Session: itsdangerous-signed cookie holding the user id; no server state.
 """
+from __future__ import annotations
 import hashlib
 import secrets
 from datetime import datetime, timedelta

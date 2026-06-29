@@ -41,7 +41,17 @@ ssh "$SERVER" "APP_DIR='$APP_DIR' SEARCH_DIR='$SEARCH_DIR' bash -s" <<'REMOTE'
 set -euo pipefail
 cd "$APP_DIR"
 
-if [ ! -d .venv ]; then python3 -m venv .venv; fi
+# (re)create the venv. A failed earlier run can leave a .venv with no pip
+# (e.g. python3-venv/ensurepip missing), so key off pip, not the directory.
+if [ ! -x .venv/bin/pip ]; then
+  rm -rf .venv
+  if ! python3 -m venv .venv; then
+    echo "!! venv creation failed. Install the venv package on the server, e.g.:"
+    echo "!!   sudo apt-get update && sudo apt-get install -y python3-venv"
+    echo "!! then re-run deploy.sh."
+    exit 1
+  fi
+fi
 .venv/bin/pip install -q --upgrade pip
 .venv/bin/pip install -q -r requirements.txt
 mkdir -p data

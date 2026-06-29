@@ -5,6 +5,7 @@ the existing server (no extra hosting cost).
 Public search stays on the static site + tantivy; this app only handles
 the paid offerings.
 """
+from __future__ import annotations
 import logging
 import os
 from contextlib import asynccontextmanager

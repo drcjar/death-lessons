@@ -3,6 +3,7 @@
 In dev_mode (or when no API key is set) emails are logged to stdout
 instead of sent, so the app is fully runnable locally without secrets.
 """
+from __future__ import annotations
 import logging
 
 import requests

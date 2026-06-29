@@ -4,6 +4,7 @@ No secret has a usable default — secrets are supplied on the server via
 environment variables (see .env.example). The app refuses to start if a
 required secret is missing in production.
 """
+from __future__ import annotations
 from functools import lru_cache
 
 from pydantic_settings import BaseSettings, SettingsConfigDict

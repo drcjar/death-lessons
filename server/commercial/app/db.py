@@ -1,4 +1,5 @@
 """SQLAlchemy engine/session setup (SQLite by default)."""
+from __future__ import annotations
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 

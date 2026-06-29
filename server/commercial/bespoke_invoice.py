@@ -1,3 +1,4 @@
+from __future__ import annotations
 #!/usr/bin/env python3
 """Send a Stripe invoice for a bespoke enquiry once you've scoped the price.
 

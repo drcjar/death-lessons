@@ -11,6 +11,7 @@ Matching reuses the live tantivy index, so alert relevance is identical
 to the website search. The first run seeds the "seen" set silently so
 subscribers aren't alerted about the entire back-catalogue.
 """
+from __future__ import annotations
 import json
 import logging
 from datetime import datetime
