@@ -1,0 +1,13 @@
+# Python deps for the deathlessons data pipeline (see PIPELINE.md).
+# pdfminer.six ships with pdfplumber but is imported directly, so pin it too.
+requests==2.34.2
+beautifulsoup4==4.15.0
+pdfplumber==0.11.10
+pdfminer.six
+pdf2image==1.17.0
+pytesseract==0.3.13
+pandas==3.0.3
+
+# System packages also required (install via apt, not pip):
+#   poppler-utils    (pdf2image / pdftoppm  - PDF -> image for OCR)
+#   tesseract-ocr    (pytesseract backend   - OCR engine)
