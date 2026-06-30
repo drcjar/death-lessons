@@ -51,6 +51,12 @@ def healthz():
     return {"ok": True}
 
 
+@app.get("/")
+def home():
+    # The app subdomain has no landing page; send visitors to the main site.
+    return RedirectResponse("https://deathlessons.org/", status_code=302)
+
+
 # --- pricing / marketing -------------------------------------------------
 
 @app.get("/pricing", response_class=HTMLResponse)
