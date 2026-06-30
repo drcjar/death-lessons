@@ -205,13 +205,19 @@ def bespoke(request: Request, email: str = Form(...), brief: str = Form(...),
     db.add(enquiry)
     db.commit()
     db.refresh(enquiry)
-    send_email(settings.bespoke_inbox,
-               f"New bespoke report enquiry #{enquiry.id}",
-               f"<p>#{enquiry.id} from {email}</p><pre>{brief}</pre>"
-               f"<p>Send an invoice: "
-               f"<code>python bespoke_invoice.py {enquiry.id} &lt;amount_pence&gt;</code></p>",
-               text=f"#{enquiry.id} from {email}\n\n{brief}\n\n"
-                    f"Send an invoice: python bespoke_invoice.py {enquiry.id} <amount_pence>")
+    # The enquiry is safely stored; the notification email is best-effort, so a
+    # mail failure must not 500 the form or lose the enquiry.
+    try:
+        send_email(settings.bespoke_inbox,
+                   f"New bespoke report enquiry #{enquiry.id}",
+                   f"<p>#{enquiry.id} from {email}</p><pre>{brief}</pre>"
+                   f"<p>Send an invoice: "
+                   f"<code>python bespoke_invoice.py {enquiry.id} &lt;amount_pence&gt;</code></p>",
+                   text=f"#{enquiry.id} from {email}\n\n{brief}\n\n"
+                        f"Send an invoice: python bespoke_invoice.py {enquiry.id} <amount_pence>")
+    except Exception as e:
+        logging.getLogger("commercial").error(
+            "bespoke notify email failed (enquiry #%s saved): %s", enquiry.id, e)
     return templates.TemplateResponse(request, "bespoke_sent.html", {})
 
 
