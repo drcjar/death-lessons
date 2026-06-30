@@ -22,7 +22,13 @@ cd "$REPO_ROOT"
 RSYNC=(rsync -av --rsync-path="sudo rsync")
 
 echo "==> [1/4] Static site -> $WEB_ROOT"
-"${RSYNC[@]}" server/app/index.html server/app/why.html "$SERVER:$WEB_ROOT/"
+# Stamp today's date into the homepage "last updated" line so it never drifts.
+stamp="$(date +'%-d %B %Y')"
+tmp_index="$(mktemp)"
+sed "s/Dataset last updated [^(]*(/Dataset last updated ${stamp} (/" server/app/index.html > "$tmp_index"
+"${RSYNC[@]}" "$tmp_index" "$SERVER:$WEB_ROOT/index.html"
+"${RSYNC[@]}" server/app/why.html "$SERVER:$WEB_ROOT/"
+rm -f "$tmp_index"
 
 echo "==> [2/4] Search data -> $SEARCH_DIR"
 if [ -f data.json ]; then
