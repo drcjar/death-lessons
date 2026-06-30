@@ -27,6 +27,7 @@ DOWNLOAD_DIR = "downloads"
 TEXT_DIR = "texts"
 LOG_PATH = "extraction_source.json"
 METADATA_PATH = "people_data.json"
+REPORT_PAGES_PATH = "report_pages.json"
 OUTPUT_PATH = "data.json"
 
 
@@ -165,6 +166,17 @@ def combine_text_and_metadata_to_json():
     else:
         extraction_source = {}
 
+    # Map each PDF filename to the real judiciary.uk report-page URL it was
+    # scraped from. The old slug-from-filename guess 404s for ~73% of records
+    # (e.g. "Barnett-2015-0222.pdf" -> /barnett/ instead of /sidney-barnett/).
+    pdf_to_url = {}
+    if os.path.exists(REPORT_PAGES_PATH):
+        with open(REPORT_PAGES_PATH, encoding='utf-8') as f:
+            for report_url, rec in json.load(f).items():
+                for href in rec.get("pdfs", []):
+                    bn = os.path.basename(href.split("?")[0])
+                    pdf_to_url.setdefault(bn, report_url)
+
     data = []
     for text_file in glob.glob(os.path.join(TEXT_DIR, '*.txt')):
         filename = os.path.basename(text_file).replace('.txt', '')
@@ -182,12 +194,16 @@ def combine_text_and_metadata_to_json():
                 fields["ref"] = f"{m.group(1)}-{m.group(2)}"
         base_slug = os.path.splitext(pdf_filename)[0].lower().replace(" ", "-")
         clean_slug = re.sub(r'-\d{4}-\d{4}(_.*)?$', '', base_slug)
+        # Prefer the real scraped report-page URL; fall back to the slug guess
+        # only when a PDF has no scraped page (rare).
+        url = pdf_to_url.get(pdf_filename) or \
+            f"https://www.judiciary.uk/prevention-of-future-death-reports/{clean_slug}/"
         entry = {
             "person": base_slug,
             **fields,
             "filename": filename,
             "text": content,
-            "url": f"https://www.judiciary.uk/prevention-of-future-death-reports/{clean_slug}/",
+            "url": url,
         }
         data.append(entry)
 
