@@ -28,6 +28,7 @@ stamp="$(date +'%-d %B %Y')"
 tmp_index="$(mktemp)"
 sed "s/Dataset last updated [^(]*(/Dataset last updated ${stamp} (/" \
     server/app/index.html > "$tmp_index"
+chmod 644 "$tmp_index"   # mktemp makes 0600; rsync -a would copy that and nginx 403s
 rsync -av --rsync-path="sudo rsync" "$tmp_index" "$SERVER:$WEB_ROOT/index.html"
 rm -f "$tmp_index"
 

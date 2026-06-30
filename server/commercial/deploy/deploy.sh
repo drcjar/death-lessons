@@ -26,6 +26,7 @@ echo "==> [1/4] Static site -> $WEB_ROOT"
 stamp="$(date +'%-d %B %Y')"
 tmp_index="$(mktemp)"
 sed "s/Dataset last updated [^(]*(/Dataset last updated ${stamp} (/" server/app/index.html > "$tmp_index"
+chmod 644 "$tmp_index"   # mktemp makes 0600; rsync -a would copy that and nginx 403s
 "${RSYNC[@]}" "$tmp_index" "$SERVER:$WEB_ROOT/index.html"
 "${RSYNC[@]}" server/app/why.html "$SERVER:$WEB_ROOT/"
 rm -f "$tmp_index"
