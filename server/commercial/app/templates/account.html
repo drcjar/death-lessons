@@ -1,45 +1,46 @@
 {% extends "base.html" %}
 {% block title %}Account — deathlessons.org{% endblock %}
 {% block content %}
-<h3>Your account</h3>
-<p class="text-muted">{{ user.email }} &middot; <a href="/portal">manage billing</a></p>
+<h1 class="serif" style="font-size:1.9rem; margin:0 0 4px;">Your account</h1>
+<p class="muted">{{ user.email }} · <a href="/portal">manage billing</a></p>
 
-<h5 class="mt-4">Bulk dataset</h5>
-{% if has_dataset %}
-  <p>✔ Purchased. <a class="btn btn-success btn-sm" href="{{ download_url }}">Download dataset</a></p>
-  <p class="text-muted"><small>Download links expire after {{ (s.download_ttl_seconds // 3600) }} hours;
-    reload this page to get a fresh one.</small></p>
-{% else %}
-  <p>Not purchased. <a href="/pricing">See pricing</a>.</p>
-{% endif %}
+<div class="section">
+  <h2>Bulk dataset</h2>
+  {% if has_dataset %}
+    <p>✓ Purchased. <a class="btn btn-primary btn-sm" href="{{ download_url }}">Download dataset</a></p>
+    <p class="muted" style="font-size:.85rem;">Download links expire after {{ (s.download_ttl_seconds // 3600) }}
+      hours; reload this page for a fresh one.</p>
+  {% else %}
+    <p class="muted">Not purchased. <a href="/pricing">See pricing</a>.</p>
+  {% endif %}
+</div>
 
-<h5 class="mt-4">Saved-query alerts</h5>
-{% if alerts_active %}
-  <p>✔ Subscription active. We'll email you when a new PFD matches any of these.</p>
-  {% if saved_queries %}
-    <ul class="list-group mb-3">
+<div class="section">
+  <h2>Saved-query alerts</h2>
+  {% if alerts_active %}
+    <p>✓ Subscription active. We'll email you when a new PFD matches any of these.</p>
+    {% if saved_queries %}
+    <ul class="list">
       {% for q in saved_queries %}
-      <li class="list-group-item d-flex justify-content-between align-items-center">
-        <span><code>{{ q.query }}</code>{% if q.include_responses %} <span class="badge badge-secondary">incl. responses</span>{% endif %}</span>
-        <form method="post" action="/saved-queries/{{ q.id }}/delete" class="mb-0">
-          <button class="btn btn-sm btn-outline-danger">Remove</button>
-        </form>
+      <li>
+        <span><code>{{ q.query }}</code>{% if q.include_responses %} <span class="badge">incl. responses</span>{% endif %}</span>
+        <form method="post" action="/saved-queries/{{ q.id }}/delete"><button class="btn btn-danger">Remove</button></form>
       </li>
       {% endfor %}
     </ul>
+    {% else %}
+    <p class="muted">No saved searches yet — add one below.</p>
+    {% endif %}
+    <form method="post" action="/saved-queries"
+          style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:12px;">
+      <input class="field" name="query" placeholder='e.g. clozapine, or "button battery"' required
+             style="flex:1; min-width:240px;">
+      <label class="checkbox"><input type="checkbox" name="include_responses" value="1"> incl. responses</label>
+      <button class="btn btn-primary">Add saved search</button>
+    </form>
   {% else %}
-    <p class="text-muted">No saved searches yet — add one below.</p>
+    <p class="muted">No active subscription. <a href="/pricing">Subscribe</a> to get emailed when a new PFD
+      matches a drug, device, hospital or hazard you monitor.</p>
   {% endif %}
-  <form method="post" action="/saved-queries" class="form-inline">
-    <input class="form-control mr-2 mb-2" name="query" placeholder="e.g. clozapine, or &quot;button battery&quot;" required style="min-width:280px;">
-    <div class="form-check mr-2 mb-2">
-      <input class="form-check-input" type="checkbox" name="include_responses" id="ir" value="1">
-      <label class="form-check-label" for="ir">incl. responses</label>
-    </div>
-    <button class="btn btn-primary mb-2">Add saved search</button>
-  </form>
-{% else %}
-  <p>No active subscription. <a href="/pricing">Subscribe</a> to get emailed when a new PFD
-    matches a drug, device, hospital or hazard you monitor.</p>
-{% endif %}
+</div>
 {% endblock %}

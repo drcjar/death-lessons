@@ -1,57 +1,43 @@
 {% extends "base.html" %}
 {% block title %}Pricing — deathlessons.org{% endblock %}
 {% block content %}
-<h3>Plans &amp; pricing</h3>
-<p class="text-muted">The public full-text search is free and always will be. These paid
-  services add value on top of the public data.</p>
+<h1 class="serif" style="font-size:1.9rem; margin:0 0 6px;">Plans &amp; pricing</h1>
+<p class="lead">The public full-text search is free and always will be. These paid services add value
+  on top of the public data.</p>
 
-<div class="card-deck">
-  <div class="card mb-3">
-    <div class="card-body">
-      <h5 class="card-title">Bulk dataset</h5>
-      <h6 class="text-muted">{{ s.price_dataset_label }}</h6>
-      <p class="card-text">The full cleaned, OCR'd, metadata-tagged corpus as JSONL —
-        reports and responses, ready for analysis.</p>
-      <form method="post" action="/buy/dataset">
-        <button class="btn btn-primary btn-block">Buy dataset</button>
-      </form>
-    </div>
+<div class="cards" style="margin-top:24px;">
+  <div class="card">
+    <h3>Bulk dataset</h3>
+    <p class="price">{{ s.price_dataset_label }}</p>
+    <p>The full cleaned, OCR'd, metadata-tagged corpus as JSONL — reports and responses, ready for analysis.</p>
+    <form method="post" action="/buy/dataset"><button class="btn btn-primary btn-block">Buy dataset</button></form>
   </div>
-
-  <div class="card mb-3">
-    <div class="card-body">
-      <h5 class="card-title">Saved-query alerts</h5>
-      <h6 class="text-muted">{{ s.price_alerts_label }}</h6>
-      <p class="card-text">Get emailed when a new PFD matches your full-text query —
-        a drug, device, hospital or hazard you monitor.</p>
-      <form method="post" action="/buy/alerts">
-        <button class="btn btn-primary btn-block">Subscribe</button>
-      </form>
-    </div>
+  <div class="card">
+    <h3>Saved-query alerts</h3>
+    <p class="price">{{ s.price_alerts_label }}</p>
+    <p>Get emailed when a new PFD matches your full-text query — a drug, device, hospital or hazard you monitor.</p>
+    <form method="post" action="/buy/alerts"><button class="btn btn-primary btn-block">Subscribe</button></form>
   </div>
-
-  <div class="card mb-3">
-    <div class="card-body">
-      <h5 class="card-title">Bespoke report</h5>
-      <h6 class="text-muted">{{ s.price_bespoke_label }}</h6>
-      <p class="card-text">We answer a specific question across the whole corpus and
-        deliver a written analysis.</p>
-      <a class="btn btn-outline-primary btn-block" href="#bespoke">Enquire</a>
-    </div>
+  <div class="card">
+    <h3>Bespoke report</h3>
+    <p class="price">{{ s.price_bespoke_label }}</p>
+    <p>We answer a specific question across the whole corpus and deliver a written analysis.</p>
+    <a class="btn btn-outline btn-block" href="#bespoke">Enquire</a>
   </div>
 </div>
 
-<hr>
-<h5 id="bespoke">Enquire about a bespoke report</h5>
-<form method="post" action="/bespoke">
-  <div class="form-group">
-    <label>Your email</label>
-    <input class="form-control" type="email" name="email" required>
-  </div>
-  <div class="form-group">
-    <label>What would you like us to analyse?</label>
-    <textarea class="form-control" name="brief" rows="4" required></textarea>
-  </div>
-  <button class="btn btn-primary">Send enquiry</button>
-</form>
+<div class="section">
+  <h2 id="bespoke">Enquire about a bespoke report</h2>
+  <form method="post" action="/bespoke" style="max-width:520px; margin-top:14px;">
+    <div class="form-row">
+      <label class="lbl">Your email</label>
+      <input class="field" type="email" name="email" required>
+    </div>
+    <div class="form-row">
+      <label class="lbl">What would you like us to analyse?</label>
+      <textarea class="field" name="brief" rows="4" required></textarea>
+    </div>
+    <button class="btn btn-primary">Send enquiry</button>
+  </form>
+</div>
 {% endblock %}

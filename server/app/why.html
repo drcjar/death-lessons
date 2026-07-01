@@ -1,116 +1,92 @@
 <!doctype html>
-<html>
+<html lang="en">
 
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Why deathlessons.org — full-text search of Prevention of Future Death reports</title>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-  <style>
-    body { padding-bottom: 4rem; }
-    .term { display: inline-block; margin: .2rem; }
-    .lead-num { font-weight: 700; }
-    table td, table th { vertical-align: middle; }
-  </style>
+  <title>Why deathlessons.org — full-text search of PFD reports</title>
+  <link rel="stylesheet" href="/style.css">
 </head>
 
 <body>
-  <div class="container">
-    <div class="row mt-4">
-      <div class="col-12">
-        <h2>Search the words, not just the labels.</h2>
-        <p class="lead">
-          deathlessons.org indexes the <strong>full text of every Prevention of Future
-          Death (PFD) report</strong> &mdash; including scanned reports recovered with OCR
-          and the agency responses &mdash; so you can find any drug, device, hospital,
-          or hazard mentioned <em>anywhere</em> in a report. Tools that only filter by
-          coroner area, date and category can't do that.
-        </p>
-        <p><a href="/">&larr; Back to search</a></p>
-      </div>
+  <header class="site-header">
+    <div class="wrap nav">
+      <a class="brand" href="/">death<span>lessons</span>.org</a>
+      <nav>
+        <a href="/">Search</a>
+        <a href="https://app.deathlessons.org/pricing">Data &amp; alerts</a>
+        <a href="https://github.com/drcjar/death-lessons">GitHub</a>
+      </nav>
     </div>
+  </header>
 
-    <div class="row mt-3">
-      <div class="col-12">
-        <h4>Searches only full-text can answer</h4>
-        <p>
-          None of these are a coroner "category" or "area" &mdash; the signal lives in the
-          body of the report. Each chip runs a live search across the corpus:
-        </p>
-        <p>
-          <a class="btn btn-outline-primary term" href="/?q=sepsis">sepsis <span class="badge badge-light">446</span></a>
-          <a class="btn btn-outline-primary term" href="/?q=ligature">ligature <span class="badge badge-light">441</span></a>
-          <a class="btn btn-outline-primary term" href="/?q=%22pulmonary+embolism%22">pulmonary embolism <span class="badge badge-light">135</span></a>
-          <a class="btn btn-outline-primary term" href="/?q=epilepsy">epilepsy <span class="badge badge-light">101</span></a>
-          <a class="btn btn-outline-primary term" href="/?q=anticoagulant">anticoagulant <span class="badge badge-light">73</span></a>
-          <a class="btn btn-outline-primary term" href="/?q=insulin">insulin <span class="badge badge-light">64</span></a>
-          <a class="btn btn-outline-primary term" href="/?q=clozapine">clozapine <span class="badge badge-light">36</span></a>
-          <a class="btn btn-outline-primary term" href="/?q=tracheostomy">tracheostomy <span class="badge badge-light">23</span></a>
-          <a class="btn btn-outline-primary term" href="/?q=%22North+Middlesex%22">"North Middlesex" hospital <span class="badge badge-light">12</span></a>
-          <a class="btn btn-outline-primary term" href="/?q=midazolam">midazolam <span class="badge badge-light">6</span></a>
-          <a class="btn btn-outline-primary term" href="/?q=%22e-scooter%22">e-scooter <span class="badge badge-light">4</span></a>
-          <a class="btn btn-outline-primary term" href="/?q=%22button+battery%22">button battery <span class="badge badge-light">2</span></a>
-        </p>
-        <p class="text-muted"><small>Counts are reports (excluding agency responses) mentioning the
-          term, from the current corpus. Numbers update as the dataset is refreshed.</small></p>
-      </div>
+  <section class="page">
+    <div class="wrap">
+      <h1>Search the words, not just the labels.</h1>
+      <p class="lead">deathlessons.org indexes the <strong>full text of every Prevention of Future
+        Death report</strong> — including scanned reports recovered with OCR and the agency
+        responses — so you can find any drug, device, hospital or hazard mentioned <em>anywhere</em>
+        in a report. Tools that only filter by coroner area, date and category can't do that.</p>
     </div>
+  </section>
 
-    <div class="row mt-4">
-      <div class="col-12">
-        <h4>How we compare</h4>
-        <table class="table table-bordered">
-          <thead class="thead-light">
-            <tr><th></th><th>deathlessons.org</th><th>Metadata-filter trackers</th></tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th scope="row">Search the body text of reports</th>
-              <td>✔ Every word, every report</td>
-              <td>✘ Filter by date / area / category only</td>
-            </tr>
-            <tr>
-              <th scope="row">Scanned / image-only reports</th>
-              <td>✔ Recovered with OCR</td>
-              <td>— Often metadata-only</td>
-            </tr>
-            <tr>
-              <th scope="row">Agency responses</th>
-              <td>✔ Indexed and searchable (toggle)</td>
-              <td>— Status tracked, text not searchable</td>
-            </tr>
-            <tr>
-              <th scope="row">Find a specific drug / device / hospital</th>
-              <td>✔ Directly, by name</td>
-              <td>✘ Not unless it's a predefined field</td>
-            </tr>
-            <tr>
-              <th scope="row">Free public search</th>
-              <td>✔ Always</td>
-              <td>✔ Browsing free; downloads paid</td>
-            </tr>
-          </tbody>
-        </table>
-        <p class="text-muted"><small>Comparison reflects publicly visible features at time of writing;
-          other tools add valuable analytics (trends, heatmaps, response-status) that we are also building.</small></p>
-      </div>
+  <section class="wrap section">
+    <h2>Searches only full-text can answer</h2>
+    <p class="lead">None of these are a coroner "category" or "area" — the signal lives in the body of
+      the report. Each runs a live search:</p>
+    <div class="chips" style="margin-top:16px;">
+      <a href="/?q=sepsis">sepsis <span class="badge">446</span></a>
+      <a href="/?q=ligature">ligature <span class="badge">441</span></a>
+      <a href="/?q=%22pulmonary+embolism%22">pulmonary embolism <span class="badge">135</span></a>
+      <a href="/?q=epilepsy">epilepsy <span class="badge">101</span></a>
+      <a href="/?q=anticoagulant">anticoagulant <span class="badge">73</span></a>
+      <a href="/?q=insulin">insulin <span class="badge">64</span></a>
+      <a href="/?q=clozapine">clozapine <span class="badge">36</span></a>
+      <a href="/?q=tracheostomy">tracheostomy <span class="badge">23</span></a>
+      <a href="/?q=%22North+Middlesex%22">"North Middlesex" <span class="badge">12</span></a>
+      <a href="/?q=midazolam">midazolam <span class="badge">6</span></a>
+      <a href="/?q=%22button+battery%22">button battery <span class="badge">2</span></a>
     </div>
+    <p class="muted" style="font-size:.85rem; margin-top:14px;">Counts are reports (excluding agency
+      responses) mentioning the term in the current corpus.</p>
+  </section>
 
-    <div class="row mt-4">
-      <div class="col-12">
-        <h4>For researchers, journalists & organisations</h4>
-        <p>The public search is free and always will be. For deeper or programmatic use we
-          offer paid services on top of this public data:</p>
-        <ul>
-          <li><strong>Bulk dataset download</strong> &mdash; the cleaned, OCR'd, metadata-tagged corpus as JSONL/CSV.</li>
-          <li><strong>Saved-query alerts</strong> &mdash; get emailed when a new PFD matches your search (e.g. a drug or device you monitor).</li>
-          <li><strong>Bespoke analytical reports</strong> &mdash; we answer a specific question across the whole corpus.</li>
-        </ul>
-        <p><a class="btn btn-primary" href="https://app.deathlessons.org/pricing">See plans &amp; pricing</a></p>
-      </div>
+  <section class="wrap section">
+    <h2>How we compare</h2>
+    <table class="compare" style="width:100%; border-collapse:collapse; margin-top:14px;">
+      <thead>
+        <tr><th></th><th>deathlessons.org</th><th>Metadata-filter trackers</th></tr>
+      </thead>
+      <tbody>
+        <tr><th>Search the body text of reports</th><td class="yes">✓ every word, every report</td><td class="no">✗ filter by date / area / category only</td></tr>
+        <tr><th>Scanned / image-only reports</th><td class="yes">✓ recovered with OCR</td><td class="no">— often metadata-only</td></tr>
+        <tr><th>Agency responses</th><td class="yes">✓ searchable (toggle)</td><td class="no">— status tracked, text not searchable</td></tr>
+        <tr><th>Find a specific drug / device / hospital</th><td class="yes">✓ directly, by name</td><td class="no">✗ not unless it's a predefined field</td></tr>
+        <tr><th>Free public search</th><td class="yes">✓ always</td><td>✓ browsing free; downloads paid</td></tr>
+      </tbody>
+    </table>
+    <p class="muted" style="font-size:.85rem; margin-top:12px;">Reflects publicly visible features at time
+      of writing; other tools add valuable analytics (trends, heatmaps, response-status) we're also building.</p>
+  </section>
+
+  <section class="wrap section">
+    <h2>For researchers, journalists &amp; organisations</h2>
+    <p class="lead">The public search is free and always will be. For deeper or programmatic use we offer
+      paid services on top of this public data:</p>
+    <div class="cards" style="margin-top:16px;">
+      <div class="card"><h3>Bulk dataset</h3><p>The cleaned, OCR'd, metadata-tagged corpus as JSONL/CSV.</p></div>
+      <div class="card"><h3>Saved-query alerts</h3><p>Get emailed when a new PFD matches your search.</p></div>
+      <div class="card"><h3>Bespoke reports</h3><p>We answer a specific question across the whole corpus.</p></div>
     </div>
-  </div>
+    <p style="margin-top:22px;"><a class="btn btn-primary" href="https://app.deathlessons.org/pricing">See plans &amp; pricing</a></p>
+  </section>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p><a href="/">← Back to search</a> · <a href="https://github.com/drcjar/death-lessons">GitHub</a></p>
+      <p class="fine">An open project making public records findable. Source reports © Crown copyright.</p>
+    </div>
+  </footer>
 </body>
 
 </html>
