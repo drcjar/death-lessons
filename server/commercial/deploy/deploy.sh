@@ -28,7 +28,8 @@ tmp_index="$(mktemp)"
 sed "s/Dataset last updated [^(]*(/Dataset last updated ${stamp} (/" server/app/index.html > "$tmp_index"
 chmod 644 "$tmp_index"   # mktemp makes 0600; rsync -a would copy that and nginx 403s
 "${RSYNC[@]}" "$tmp_index" "$SERVER:$WEB_ROOT/index.html"
-"${RSYNC[@]}" server/app/why.html server/app/style.css "$SERVER:$WEB_ROOT/"
+"${RSYNC[@]}" server/app/why.html server/app/style.css \
+  server/app/terms.html server/app/privacy.html "$SERVER:$WEB_ROOT/"
 rm -f "$tmp_index"
 
 echo "==> [2/4] Search data -> $SEARCH_DIR"
