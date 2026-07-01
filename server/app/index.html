@@ -1,224 +1,303 @@
 <!doctype html>
-<html>
+<html lang="en">
 
 <head>
-  <title>deathlessons.org</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>deathlessons.org — search Prevention of Future Death reports</title>
+  <meta name="description"
+    content="Full-text search of every UK coroner's Prevention of Future Death (PFD) report, including OCR'd scans.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="//cdn.datatables.net/1.10.23/css/jquery.dataTables.min.css">
   <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
   <script src="//cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js"></script>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
   <style>
-    .no-display {
-      display: none;
+    :root {
+      --ink: #16202e;
+      --muted: #5a6678;
+      --faint: #8a94a4;
+      --accent: #2160df;
+      --accent-dark: #1a4fbd;
+      --bg: #ffffff;
+      --bg-soft: #f4f7fb;
+      --border: #e4e9f0;
+      --highlight: #fff1a8;
+      --radius: 12px;
+      --shadow: 0 1px 2px rgba(20,32,46,.04), 0 8px 30px rgba(20,32,46,.06);
     }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0; color: var(--ink); background: var(--bg);
+      font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      line-height: 1.55; -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .wrap { max-width: 880px; margin: 0 auto; padding: 0 20px; }
 
-    span.highlight {
-      background-color: #fcfc7d;
+    /* header */
+    .site-header { border-bottom: 1px solid var(--border); background: rgba(255,255,255,.85); backdrop-filter: saturate(1.4) blur(6px); position: sticky; top: 0; z-index: 10; }
+    .nav { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+    .brand { font-weight: 700; color: var(--ink); font-size: 1.12rem; letter-spacing: -.01em; }
+    .brand span { color: var(--accent); }
+    .nav nav a { color: var(--muted); font-weight: 500; font-size: .92rem; margin-left: 22px; }
+    .nav nav a:hover { color: var(--ink); text-decoration: none; }
+    @media (max-width: 560px){ .nav nav a:nth-child(3){ display:none; } .nav nav a { margin-left: 16px; } }
+
+    /* hero */
+    .hero { background: linear-gradient(180deg, var(--bg-soft), #fff); border-bottom: 1px solid var(--border); padding: 64px 0 48px; }
+    .hero h1 {
+      font-family: 'Newsreader', Georgia, serif; font-weight: 600;
+      font-size: clamp(1.9rem, 4.5vw, 3rem); line-height: 1.1; letter-spacing: -.02em;
+      margin: 0 0 14px;
     }
+    .hero .sub { font-size: 1.08rem; color: var(--muted); max-width: 620px; margin: 0 0 28px; }
+    .hero .sub strong { color: var(--ink); font-weight: 600; }
+
+    /* search */
+    .searchbar { display: flex; gap: 10px; max-width: 680px; }
+    .searchbar input {
+      flex: 1; font-size: 1.05rem; padding: 15px 18px; border: 1px solid var(--border);
+      border-radius: var(--radius); background: #fff; box-shadow: var(--shadow); color: var(--ink);
+      font-family: inherit; outline: none; transition: border-color .15s, box-shadow .15s;
+    }
+    .searchbar input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(33,96,223,.12); }
+    .searchbar button {
+      font: inherit; font-weight: 600; color: #fff; background: var(--accent); border: 0;
+      padding: 0 26px; border-radius: var(--radius); cursor: pointer; transition: background .15s;
+    }
+    .searchbar button:hover { background: var(--accent-dark); }
+    .toggle { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); font-size: .9rem; margin: 14px 0 0; cursor: pointer; }
+    .chips { margin-top: 22px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .chips > span { color: var(--faint); font-size: .85rem; margin-right: 2px; }
+    .chips a {
+      font-size: .88rem; color: var(--muted); background: #fff; border: 1px solid var(--border);
+      padding: 6px 12px; border-radius: 999px; transition: all .15s;
+    }
+    .chips a:hover { color: var(--accent); border-color: var(--accent); text-decoration: none; }
+
+    /* results */
+    .results { padding: 32px 0 8px; }
+    span.highlight { background: var(--highlight); border-radius: 3px; padding: 0 1px; }
+    .show-more { font-weight: 500; white-space: nowrap; }
+    /* DataTables cleanup */
+    .dataTables_wrapper { font-size: .96rem; }
+    table.dataTable { border-collapse: separate !important; border-spacing: 0; }
+    table.dataTable thead th { border-bottom: 1px solid var(--border); color: var(--faint); font-weight: 600; font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; padding: 10px 12px; }
+    table.dataTable tbody td { padding: 16px 12px; border-bottom: 1px solid var(--border); vertical-align: top; color: var(--ink); }
+    table.dataTable tbody tr:hover { background: var(--bg-soft); }
+    table.dataTable td:last-child { white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .dataTables_filter, .dataTables_info, .dataTables_length { color: var(--muted); }
+    .dataTables_paginate .paginate_button { border-radius: 8px !important; }
+    .dataTables_paginate .paginate_button.current { background: var(--accent) !important; border-color: var(--accent) !important; color: #fff !important; }
+
+    /* research */
+    .research { padding: 40px 0; border-top: 1px solid var(--border); margin-top: 24px; }
+    .research h2 { font-family: 'Newsreader', Georgia, serif; font-weight: 600; font-size: 1.5rem; margin: 0 0 6px; }
+    .research p.lead { color: var(--muted); margin: 0 0 18px; }
+    .pubs { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+    .pubs li { border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; background: #fff; box-shadow: var(--shadow); }
+    .pubs .venue { color: var(--faint); font-size: .82rem; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+    .pubs .ttl { display: block; margin-top: 3px; font-weight: 600; color: var(--ink); }
+    .pubs .ttl:hover { color: var(--accent); }
+    .pubs .authors { display: block; color: var(--muted); font-size: .88rem; margin-top: 4px; }
+
+    /* footer */
+    .site-footer { border-top: 1px solid var(--border); background: var(--bg-soft); padding: 28px 0 40px; color: var(--muted); font-size: .9rem; }
+    .site-footer a { color: var(--muted); text-decoration: underline; text-underline-offset: 2px; }
+    .site-footer a:hover { color: var(--accent); }
+    .site-footer .fine { color: var(--faint); font-size: .82rem; margin-top: 6px; }
   </style>
 </head>
 
-
 <body>
-
-  <div class="container-fluid">
-    <div class="row mt-4">
-      <div class="col-8">
-        <h3>Making Reports to Prevent Future Deaths searchable.</h3>
-      </div>
-
+  <header class="site-header">
+    <div class="wrap nav">
+      <a class="brand" href="/">death<span>lessons</span>.org</a>
+      <nav>
+        <a href="/why.html">Why</a>
+        <a href="https://app.deathlessons.org/pricing">Data &amp; alerts</a>
+        <a href="#research">Research</a>
+        <a href="https://github.com/drcjar/death-lessons">GitHub</a>
+      </nav>
     </div>
-    <div class="row mt-4">
-      <div class="col-8">
-        <form id="search">
-          <div class="form-row">
-            <div class="col-10">
-              <input class="form-control" name="q" id="q">
-            </div>
+  </header>
 
-            <div class="col-2">
-              <button class="btn btn-primary text-uppercase type=" submit">search</button>
-            </div>
-          </div>
-          <div class="form-row mt-2">
-            <div class="col">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="include-responses">
-                <label class="form-check-label" for="include-responses">
-                  Include agency responses (default: Prevention of Future Death reports only)
-                </label>
-              </div>
-            </div>
-          </div>
-        </form>
-      </div>
-      <div class="col-2"></div>
-    </div>
+  <section class="hero">
+    <div class="wrap">
+      <h1>Search every Prevention&nbsp;of&nbsp;Future&nbsp;Death report</h1>
+      <p class="sub">When a death reveals a risk that could recur, coroners in England &amp; Wales must publish
+        a report so it can be prevented. We make the full text of <strong>13,900+</strong> reports —
+        including scanned ones recovered with OCR — instantly searchable.</p>
 
-    <div class="row mt-4">
-      <div class="col-8">
-        <p>
-          Some example queries:
-        </p>
-        <ul>
-          <li>
-            <a href="http://deathlessons.org/?q=Asthma">Asthma</a>
-          </li>
-          <li>
-            <a href="http://deathlessons.org/?q=%22North+Middlesex+Hospital%22">"North Middlesex Hospital"</a>
-          </li>
-        </ul>
-        <p>
-          Dataset last updated 30th of June 2026 (<a href="https://www.judiciary.uk/subject/prevention-of-future-deaths/">source</a>)
-        </p>
-        <p>
-          <a href="/why.html">Why full-text search beats metadata filters</a> &middot;
-          <a href="https://app.deathlessons.org/pricing">Data, alerts &amp; bespoke reports</a>
-        </p>
+      <form id="search" class="searchbar">
+        <input class="form-control" name="q" id="q" autocomplete="off"
+          placeholder="Search reports — e.g. asthma, clozapine, North Middlesex Hospital">
+        <button type="submit">Search</button>
+      </form>
+      <label class="toggle" for="include-responses">
+        <input type="checkbox" id="include-responses"> Include agency responses (default: reports only)
+      </label>
 
-
+      <div class="chips">
+        <span>Try</span>
+        <a href="/?q=Asthma">asthma</a>
+        <a href="/?q=sickle">sickle cell</a>
+        <a href="/?q=ligature">ligature</a>
+        <a href="/?q=sepsis">sepsis</a>
+        <a href="/?q=clozapine">clozapine</a>
+        <a href="/?q=%22North+Middlesex+Hospital%22">"North Middlesex Hospital"</a>
       </div>
     </div>
+  </section>
 
-    <div class="row mt-4">
-      <table id="results-table" class="display" style="width:100%">
-      </table>
+  <section class="wrap results">
+    <table id="results-table" class="display" style="width:100%"></table>
+  </section>
+
+  <section id="research" class="wrap research">
+    <h2>Research using deathlessons.org</h2>
+    <p class="lead">Published research drawing on these reports:</p>
+    <ul class="pubs">
+      <li>
+        <span class="venue">Heart (BMJ) · 2025 · abstract A7.2</span>
+        <a class="ttl" href="https://heart.bmj.com/content/heartjnl/111/Suppl_3/A7.2.full.pdf">Preventable deaths from cardiac tamponade: a national 10-year report on coroner inquiries</a>
+        <span class="authors">Chan IYH, Mallah SI, Philip KEJ, Reynolds C</span>
+      </li>
+      <li>
+        <span class="venue">European Respiratory Journal · 2025 · abstract PA3701</span>
+        <a class="ttl" href="https://publications.ersnet.org/content/erj/66/suppl69/pa3701">Preventable deaths from chest drain misplacement: a national 10-year report on coroner inquiries</a>
+        <span class="authors">Chan I, Karimi R, Carruthers E, Reynolds C</span>
+      </li>
+      <li>
+        <span class="venue">European Respiratory Journal · 2023 · abstract PA1778</span>
+        <a class="ttl" href="https://publications.ersnet.org/content/erj/62/suppl67/pa1778">Preventing future chest drain related deaths</a>
+        <span class="authors">Khan T, Ross C, Sinharay R, Park M, O'Mahony A, Torrealba C, Reynolds C</span>
+      </li>
+      <li>
+        <span class="venue">European Respiratory Journal · 2021 · abstract PA633</span>
+        <a class="ttl" href="https://publications.ersnet.org/content/erj/58/suppl65/pa633">Preventing future asthma deaths</a>
+        <span class="authors">Reynolds C, Vlachantoni I, Potter J, Moonsie I, Valerio C, Mangera Z</span>
+      </li>
+    </ul>
+  </section>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>Dataset last updated 30 June 2026 (<a href="https://www.judiciary.uk/subject/prevention-of-future-deaths/">source</a>)
+        · <a href="https://github.com/drcjar/death-lessons">GitHub</a>
+        · <a href="/why.html">why full-text search</a></p>
+      <p class="fine">An open project making public records findable. Source reports © Crown copyright.</p>
     </div>
-  </div>
+  </footer>
 
+  <script>
+    // global, datatable can't be initialised twice
+    let data_table;
+    // cache the last response so the responses toggle can re-filter without refetching
+    let lastHits = [];
+    let lastQuery = "";
 
-  <div style="position: absolute; top: 0px; right: 0px;">
-    <a href="https://github.com/drcjar/death-lessons"><img loading="lazy" width="149" height="149"
-        src="https://github.blog/wp-content/uploads/2008/12/forkme_right_red_aa0000.png?resize=149%2C149"
-        class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1"></a>
-  </div>
-
-</body>
-
-<script>
-  // global, datatable can't be initialised twice
-  let data_table;
-  // cache the last response so the responses toggle can re-filter without refetching
-  let lastHits = [];
-  let lastQuery = "";
-
-  function _transpose(array) {
-    if (array.length === 0 || array[0].length === 0) return [];
-    return array[0].map((_, ix) => array.map(row => row[ix]));
-  }
-
-  // $&
-  function highlight(s, q) {
-    // trim leading and trailing quotation marks
-    if (q.startsWith('"')) {
-      q = q.substr(1);
-    }
-    if (q.endsWith('"')) {
-      q = q.slice(0, -1);
+    function _transpose(array) {
+      if (array.length === 0 || array[0].length === 0) return [];
+      return array[0].map((_, ix) => array.map(row => row[ix]));
     }
 
-    const qs = q.split(/\s+/).map(x => `\\b${x}\\b`);
-    const search = new RegExp(qs.join("\\s+"), "gi");
-    return s.replaceAll(search, '<span class="highlight">$&</span>');
-  }
-
-  // A document is an agency "response" (not a PFD report) if its filename
-  // says so. Mirrors the build_data.py rule exactly.
-  function isResponse(hit) {
-    const fn = (hit.doc.filename && hit.doc.filename[0]) || "";
-    return fn.toLowerCase().includes("response");
-  }
-
-  // Render the cached hits, filtered by the responses toggle.
-  function render() {
-    const includeResponses = document.querySelector('#include-responses').checked;
-    const hits = includeResponses ? lastHits : lastHits.filter(h => !isResponse(h));
-
-    // Keep the toggle state in the URL so results are shareable
-    const url = new URL(window.location);
-    if (includeResponses) {
-      url.searchParams.set('responses', '1');
-    } else {
-      url.searchParams.delete('responses');
-    }
-    window.history.replaceState({}, '', url);
-
-    const columns = ['text', 'ref', 'url'];
-    const data = _transpose(columns.map(col => hits.map(x => x.doc[col][0])));
-
-    if (data_table !== undefined) {
-      data_table.destroy();
-      data_table = undefined;
+    // $&
+    function highlight(s, q) {
+      if (q.startsWith('"')) { q = q.substr(1); }
+      if (q.endsWith('"')) { q = q.slice(0, -1); }
+      const qs = q.split(/\s+/).map(x => `\\b${x}\\b`);
+      const search = new RegExp(qs.join("\\s+"), "gi");
+      return s.replaceAll(search, '<span class="highlight">$&</span>');
     }
 
-    data_table = $('#results-table').DataTable({
-      searching: false, // already searching in the search box
-      data: data,
-      lengthChange: false,
-      columns: [
-        {
-          title: "Text", render: (content, _, row) => {
-            const max = 250;
-            if (content.length > max) {
-              const c = highlight(content.substr(0, max), lastQuery);
-              const h = highlight(content.substr(max, content.length - max), lastQuery);
-              return `${c}<span class="top"><span class="ellipsis">...&nbsp;</span><span><span class="hidden-text no-display">${h}</span>&nbsp;
-                  <a href="#" class="show-more">show more</a></span>
-              </span>
-              `;
+    // A document is an agency "response" (not a PFD report) if its filename says so.
+    function isResponse(hit) {
+      const fn = (hit.doc.filename && hit.doc.filename[0]) || "";
+      return fn.toLowerCase().includes("response");
+    }
+
+    function render() {
+      const includeResponses = document.querySelector('#include-responses').checked;
+      const hits = includeResponses ? lastHits : lastHits.filter(h => !isResponse(h));
+
+      const url = new URL(window.location);
+      if (includeResponses) { url.searchParams.set('responses', '1'); }
+      else { url.searchParams.delete('responses'); }
+      window.history.replaceState({}, '', url);
+
+      const columns = ['text', 'ref', 'url'];
+      const data = _transpose(columns.map(col => hits.map(x => x.doc[col][0])));
+
+      if (data_table !== undefined) { data_table.destroy(); data_table = undefined; }
+
+      data_table = $('#results-table').DataTable({
+        searching: false,
+        data: data,
+        lengthChange: false,
+        language: { emptyTable: "No matching reports — try another term." },
+        columns: [
+          {
+            title: "Report", render: (content, _, row) => {
+              const max = 250;
+              if (content.length > max) {
+                const c = highlight(content.substr(0, max), lastQuery);
+                const h = highlight(content.substr(max, content.length - max), lastQuery);
+                return `${c}<span class="top"><span class="ellipsis">...&nbsp;</span><span><span class="hidden-text" style="display:none">${h}</span>&nbsp;
+                    <a href="#" class="show-more">show more</a></span>
+                </span>`;
+              }
+              return highlight(content || "", lastQuery);
             }
-          }
-        },
-        { title: "Ref", render: (x, _, row) => `<a href=${row[2]}>${x}</a>` },
-      ],
-    });
-  }
-
-  function runSearch(event) {
-    event.preventDefault();
-    let query = document.querySelector('#q').value;
-
-    // Keep query around
-    const url = new URL(window.location);
-    url.searchParams.set('q', query);
-    window.history.pushState({}, '', url);
-
-    fetch(`/api?q=${query}&nhits=1000`).then(response => response.json()).then(result => {
-      lastHits = result.hits;
-      lastQuery = query;
-      render();
-    });
-
-    $("#results-table").on("click", ".show-more", event => {
-      const top = $(event.target).parents('span.top');
-      top.find('.ellipsis').addClass('no-display');
-      top.find('.hidden-text').removeClass('no-display');
-      top.find('.show-more').addClass('no-display');
-      return false;
-    });
-  }
-
-  document.querySelector('#search').addEventListener('submit', runSearch);
-  // Re-filter instantly when the responses toggle changes (no refetch)
-  document.querySelector('#include-responses').addEventListener('change', _ => {
-    if (lastHits.length > 0) render();
-  });
-
-  $(document).ready(_ => {
-    // Allow sharing of URLs (query + responses toggle)
-    const url = new URL(window.location);
-    const query = url.searchParams.get("q");
-    if (url.searchParams.get("responses") === "1") {
-      document.querySelector('#include-responses').checked = true;
+          },
+          { title: "Ref", render: (x, _, row) => `<a href=${row[2]}>${x}</a>` },
+        ],
+      });
     }
-    console.log("loading query", query);
-    if (query !== undefined && query != "") {
-      document.querySelector('#q').value = query;
-      document.querySelector('#search button').click();
-    };
-  });
 
-</script>
+    function runSearch(event) {
+      event.preventDefault();
+      let query = document.querySelector('#q').value;
+      const url = new URL(window.location);
+      url.searchParams.set('q', query);
+      window.history.pushState({}, '', url);
+
+      fetch(`/api?q=${query}&nhits=1000`).then(response => response.json()).then(result => {
+        lastHits = result.hits;
+        lastQuery = query;
+        render();
+      });
+
+      $("#results-table").on("click", ".show-more", event => {
+        const top = $(event.target).parents('span.top');
+        top.find('.ellipsis').hide();
+        top.find('.hidden-text').show();
+        top.find('.show-more').hide();
+        return false;
+      });
+    }
+
+    document.querySelector('#search').addEventListener('submit', runSearch);
+    document.querySelector('#include-responses').addEventListener('change', _ => {
+      if (lastHits.length > 0) render();
+    });
+
+    $(document).ready(_ => {
+      const url = new URL(window.location);
+      const query = url.searchParams.get("q");
+      if (url.searchParams.get("responses") === "1") {
+        document.querySelector('#include-responses').checked = true;
+      }
+      if (query !== undefined && query != "") {
+        document.querySelector('#q').value = query;
+        document.querySelector('#search button').click();
+      }
+    });
+  </script>
+</body>
 
 </html>
