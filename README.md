@@ -6,7 +6,7 @@ Prior to [deathlessons.org](http://deathlessons.org) PFD reports were not easily
 
 # Downloading the data
 
-If you like you can [download a csv](https://github.com/drcjar/death-lessons/blob/master/death_lessons.csv) of all of the data. The header looks like this:
+If you like you can [download an export](https://app.deathlessons.org/pricing) of all of the data. The header looks like this:
 ![image](https://github.com/user-attachments/assets/58627e47-6fb3-4af1-ba40-e1be41449859)
 
 # Technical Notes
